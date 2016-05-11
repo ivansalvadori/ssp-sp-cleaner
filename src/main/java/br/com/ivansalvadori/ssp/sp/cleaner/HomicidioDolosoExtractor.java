@@ -10,7 +10,11 @@ import java.nio.file.Paths;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.hamcrest.core.StringEndsWith;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -43,13 +47,34 @@ public class HomicidioDolosoExtractor {
 
     public void downloadBo(String sessionId, String ano, String numeroBo, String idDelegacia) throws IOException {
 
+        String boFilePath = "/home/ivan/Documents/Working/SSP-Datasets/HomicidioDoloso/2015/RawData/BOs/BO_" + idDelegacia + "-" + numeroBo + ".html";
+
+        System.out.println("baixando BO: " + idDelegacia + "-" + numeroBo);
+
         HttpClient client = HttpClientBuilder.create().build();
 
+        HttpPost postBo = new HttpPost("http://www.ssp.sp.gov.br/transparenciassp/Consulta.aspx/AbrirBoletim");
+        postBo.addHeader("Cookie", "ASP.NET_SessionId=0411wb4n40afv42uyp14o4t4");
+        postBo.addHeader("Content-Type", "application/json; charset=utf-8;");
+        String requestBody = "{ \"anoBO\": \"%s\", \"numBO\": \"%s\", \"delegacia\": \"%s\" }";
+        String format = String.format(requestBody, ano, numeroBo, idDelegacia);
+        postBo.setEntity(new StringEntity(format));
+        try {
+            client.execute(postBo);
+        } catch (HttpHostConnectException e) {
+            System.out.println("segunda tentativa - baixando BO: " + idDelegacia + "-" + numeroBo);
+            try {
+                client.execute(postBo);
+            } catch (HttpHostConnectException e2) {
+                System.out.println("ERRO BO: " + idDelegacia + "-" + numeroBo);
+                return;
+            }
+        }
+
         HttpGet getBo = new HttpGet("http://www.ssp.sp.gov.br/transparenciassp/BO.aspx");
-        getBo.setHeader("Cookie", "ASP.NET_SessionId=ukdueib12uc2tv24oas5wx2q; _ga=GA1.3.1899212414.1462842076; style=padrao");
+        getBo.setHeader("Cookie", "ASP.NET_SessionId=0411wb4n40afv42uyp14o4t4");
         HttpResponse bOresponse = client.execute(getBo);
 
-        String boFilePath = "/home/ivan/Documents/Working/SSP-Dataset/homicidioDoloso/2015/BOs/BO_" + idDelegacia + "-" + numeroBo + ".html";
         InputStream boHtml = bOresponse.getEntity().getContent();
 
         try {
