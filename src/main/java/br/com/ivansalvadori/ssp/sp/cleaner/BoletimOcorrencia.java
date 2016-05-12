@@ -1,5 +1,6 @@
 package br.com.ivansalvadori.ssp.sp.cleaner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BoletimOcorrencia {
@@ -10,15 +11,23 @@ public class BoletimOcorrencia {
     private String tipoLocal;
     private String circunscricao;
     private String dataOcorrencia;
+    private String turnoOcorrecenia;
     private String dataComunicacao;
     private String horaComunicacao;
     private String dataElaboracao;
     private String horaElaboracao;
     private String flagrante;
-    private List<NaturezaBoletim> naturezas;
     private String examesRequisitados;
     private String solucao;
-    private List<ParteEnvolvida> partesEnvolvidas;
+    private List<ParteEnvolvida> partesEnvolvidas = new ArrayList<>();
+    private List<NaturezaBoletim> naturezas = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "BoletimOcorrencia [numero=" + numero + ", idDelegacia=" + idDelegacia + ", dependencia=" + dependencia + ", local=" + local + ", tipoLocal=" + tipoLocal + ", circunscricao=" + circunscricao + ", dataOcorrencia=" + dataOcorrencia + ", turnoOcorrecenia=" + turnoOcorrecenia
+                + ", dataComunicacao=" + dataComunicacao + ", horaComunicacao=" + horaComunicacao + ", dataElaboracao=" + dataElaboracao + ", horaElaboracao=" + horaElaboracao + ", flagrante=" + flagrante + ", examesRequisitados=" + examesRequisitados + ", solucao=" + solucao + ", partesEnvolvidas="
+                + partesEnvolvidas + ", naturezas=" + naturezas + "]";
+    }
 
     public String getNumero() {
         return numero;
@@ -108,14 +117,6 @@ public class BoletimOcorrencia {
         this.flagrante = flagrante;
     }
 
-    public List<NaturezaBoletim> getNaturezas() {
-        return naturezas;
-    }
-
-    public void setNaturezas(List<NaturezaBoletim> naturezas) {
-        this.naturezas = naturezas;
-    }
-
     public String getExamesRequisitados() {
         return examesRequisitados;
     }
@@ -132,12 +133,6 @@ public class BoletimOcorrencia {
         this.solucao = solucao;
     }
 
-    @Override
-    public String toString() {
-        return "BoletimOcorrencia [numero=" + numero + ", dependencia=" + dependencia + ", local=" + local + ", tipoLocal=" + tipoLocal + ", circunscricao=" + circunscricao + ", dataOcorrencia=" + dataOcorrencia + ", dataComunicacao=" + dataComunicacao + ", horaComunicacao=" + horaComunicacao
-                + ", dataElaboracao=" + dataElaboracao + ", horaElaboracao=" + horaElaboracao + ", flagrante=" + flagrante + ", naturezas=" + naturezas + ", examesRequisitados=" + examesRequisitados + ", solucao=" + solucao + "]";
-    }
-
     public String getIdDelegacia() {
         return idDelegacia;
     }
@@ -152,6 +147,22 @@ public class BoletimOcorrencia {
 
     public void setPartesEnvolvidas(List<ParteEnvolvida> partesEnvolvidas) {
         this.partesEnvolvidas = partesEnvolvidas;
+    }
+
+    public String getTurnoOcorrecenia() {
+        return turnoOcorrecenia;
+    }
+
+    public void setTurnoOcorrecenia(String turnoOcorrecenia) {
+        this.turnoOcorrecenia = turnoOcorrecenia;
+    }
+
+    public List<NaturezaBoletim> getNaturezas() {
+        return naturezas;
+    }
+
+    public void setNaturezas(List<NaturezaBoletim> naturezas) {
+        this.naturezas = naturezas;
     }
 
 }

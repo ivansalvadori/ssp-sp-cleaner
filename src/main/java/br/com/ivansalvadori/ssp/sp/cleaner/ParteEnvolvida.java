@@ -13,6 +13,7 @@ public class ParteEnvolvida {
     private String instrucao;
     private String profissao;
     private String cutis;
+    private String naturezasEnvolvidas;
 
     public String getNome() {
         return nome;
@@ -102,8 +103,6 @@ public class ParteEnvolvida {
         this.profissao = profissao;
     }
 
-    
-
     public String getIdade() {
         return idade;
     }
@@ -112,11 +111,18 @@ public class ParteEnvolvida {
         this.idade = idade;
     }
 
+    public String getNaturezasEnvolvidas() {
+        return naturezasEnvolvidas;
+    }
+
+    public void setNaturezasEnvolvidas(String naturezasEnvolvidas) {
+        this.naturezasEnvolvidas = naturezasEnvolvidas;
+    }
+
     @Override
     public String toString() {
-        return "ParteEnvolvida [nome=" + nome + ", tipoEnvolvimento=" + tipoEnvolvimento + ", rg=" + rg + ", naturalidade=" + naturalidade + ", nacionalidade=" + nacionalidade + ", sexo=" + sexo + ", dataNascimento=" + dataNascimento + ", idade=" + idade + ", estadoCivil=" + estadoCivil + ", instrucao=" + instrucao + ", profissao=" + profissao + ", cutis=" + cutis + "]";
+        return "ParteEnvolvida [nome=" + nome + ", tipoEnvolvimento=" + tipoEnvolvimento + ", rg=" + rg + ", naturalidade=" + naturalidade + ", nacionalidade=" + nacionalidade + ", sexo=" + sexo + ", dataNascimento=" + dataNascimento + ", idade=" + idade + ", estadoCivil=" + estadoCivil
+                + ", instrucao=" + instrucao + ", profissao=" + profissao + ", cutis=" + cutis + ", naturezasEnvolvidas=" + naturezasEnvolvidas + "]";
     }
-    
-    
 
 }

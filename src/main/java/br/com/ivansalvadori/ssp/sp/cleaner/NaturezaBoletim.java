@@ -4,6 +4,7 @@ public class NaturezaBoletim {
 
     private String especie;
     private String descricao;
+    private String desdobramentos;
 
     public String getEspecie() {
         return especie;
@@ -19,6 +20,19 @@ public class NaturezaBoletim {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getDesdobramentos() {
+        return desdobramentos;
+    }
+
+    public void setDesdobramentos(String desdobramentos) {
+        this.desdobramentos = desdobramentos;
+    }
+
+    @Override
+    public String toString() {
+        return "NaturezaBoletim [especie=" + especie + ", descricao=" + descricao + ", desdobramentos=" + desdobramentos + "]";
     }
 
 }

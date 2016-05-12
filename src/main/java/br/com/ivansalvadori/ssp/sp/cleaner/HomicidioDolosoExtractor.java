@@ -39,9 +39,7 @@ public class HomicidioDolosoExtractor {
                 String idDelegacia = split[2].trim();
                 downloadBo(sessionId, ano, numeroBo, idDelegacia, pastaGravacaoBos);
             }
-
         }
-
     }
 
     public void downloadBo(String sessionId, String ano, String numeroBo, String idDelegacia, String pastaGravacaoBos) throws IOException {

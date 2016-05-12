@@ -1,26 +1,29 @@
 package br.com.ivansalvadori.ssp.sp.cleaner;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class BoletimOcorrenciasExtractor {
 
     public void parseDocument(String folderPath) throws IOException {
         BoletimOcorrencia boletimOcorrencia = new BoletimOcorrencia();
-        Map<String, String> properties = new HashMap<>();
         File[] files = new File(folderPath).listFiles();
         for (File file : files) {
             if (!file.isFile()) {
@@ -36,6 +39,28 @@ public class BoletimOcorrenciasExtractor {
             String[] split = idDelegaciaENumeroBo.split("-");
             boletimOcorrencia.setIdDelegacia(split[0]);
             boletimOcorrencia.setNumero(split[1]);
+
+            Elements divEspecie = doc.select("div:matchesOwn(Espécie:)");
+            Iterator<Element> divEspecieIterator = divEspecie.iterator();
+            while (divEspecieIterator.hasNext()) {
+                NaturezaBoletim naturezaBoletim = new NaturezaBoletim();
+
+                Element natureza = divEspecieIterator.next();
+                String especie = natureza.parent().siblingElements().get(0).child(0).html().trim();
+                naturezaBoletim.setEspecie(especie);
+
+                Node nodoNatureza = natureza.parent().parent().nextSibling();
+                String descricao = nodoNatureza.childNode(1).childNode(0).childNode(0).toString().trim();
+                naturezaBoletim.setDescricao(descricao);
+
+                Node nodoConsumado = nodoNatureza.nextSibling();
+                Node nodoDesdobramentos = nodoConsumado.nextSibling();
+                if (nodoDesdobramentos.childNode(0).childNode(0).childNodeSize() > 0) {
+                    String desdobramentos = nodoDesdobramentos.childNode(1).childNode(0).childNode(0).toString().trim();
+                    naturezaBoletim.setDesdobramentos(desdobramentos);
+                }
+                boletimOcorrencia.getNaturezas().add(naturezaBoletim);
+            }
 
             Element divLocal = doc.select("div:matchesOwn(Local:)").get(0);
             Iterator<Element> iteratorDetalhes = divLocal.parent().parent().parent().getElementsByTag("div").iterator();
@@ -95,8 +120,7 @@ public class BoletimOcorrenciasExtractor {
 
             List<ParteEnvolvida> partesEnvolvidas = parsePartesEnvolvidas(doc);
             boletimOcorrencia.setPartesEnvolvidas(partesEnvolvidas);
-            
-            
+
             Element elementExames = doc.getElementsContainingText("Exames requisitados:").last();
             if (elementExames != null) {
                 boletimOcorrencia.setExamesRequisitados(elementExames.html().replace("Exames requisitados:", "").trim());
@@ -107,72 +131,69 @@ public class BoletimOcorrenciasExtractor {
                 boletimOcorrencia.setSolucao(elementSolucao.html().replace("Solução:", "").trim());
             }
 
-           // System.out.println(boletimOcorrencia);
+            try (Writer writer = new FileWriter(file.getCanonicalFile() + ".json")) {
+                Gson gson = new GsonBuilder().create();
+                gson.toJson(boletimOcorrencia, writer);
+            }
         }
 
     }
-    
-    private List<ParteEnvolvida> parsePartesEnvolvidas(Document doc){
+
+    private List<ParteEnvolvida> parsePartesEnvolvidas(Document doc) {
         List<ParteEnvolvida> partes = new ArrayList<>();
         Elements elementVitimas = doc.getElementsMatchingOwnText("(Vítima)");
         elementVitimas.remove(0);
         Object[] vitimasRaw = elementVitimas.toArray();
         for (Object vitimaRaw : vitimasRaw) {
-            String html = ((Element)vitimaRaw).html();
-            List<String> fragmentos = Arrays.asList(html.split(" - "));;
+            String html = ((Element) vitimaRaw).html();
+            List<String> fragmentos = Arrays.asList(html.split(" - "));
+
             ParteEnvolvida parteEnvolvida = new ParteEnvolvida();
-            
+
             String nomeAndTipoEnvolvimento = fragmentos.get(0);
-            
+
             Matcher macherTipoEnvolvimento = Pattern.compile("\\(([^)]+)\\)").matcher(nomeAndTipoEnvolvimento);
-            while(macherTipoEnvolvimento.find()) {
+            while (macherTipoEnvolvimento.find()) {
                 String tipoEnvolvimento = macherTipoEnvolvimento.group(1);
                 parteEnvolvida.setTipoEnvolvimento(tipoEnvolvimento);
-                String nome = nomeAndTipoEnvolvimento.replace("("+tipoEnvolvimento+")", "").trim();
+                String nome = nomeAndTipoEnvolvimento.replace("(" + tipoEnvolvimento + ")", "").trim();
                 parteEnvolvida.setNome(nome);
             }
-            
+
             for (String fragmento : fragmentos) {
-                if(fragmento.startsWith("RG:")){
+                if (fragmento.startsWith("RG:")) {
                     parteEnvolvida.setRg(fragmento.replace("RG:", "").trim());
-                }
-                else if(fragmento.startsWith("Natural de:")){
+                } else if (fragmento.startsWith("Natural de:")) {
                     parteEnvolvida.setNaturalidade(fragmento.replace("Natural de:", "").trim());
-                }
-                else if(fragmento.startsWith("Nacionalidade:")){
+                } else if (fragmento.startsWith("Nacionalidade:")) {
                     parteEnvolvida.setNacionalidade(fragmento.replace("Nacionalidade:", "").trim());
-                }
-                else if(fragmento.startsWith("Sexo:")){
+                } else if (fragmento.startsWith("Sexo:")) {
                     parteEnvolvida.setSexo(fragmento.replace("Sexo:", "").trim());
-                }
-                else if(fragmento.startsWith("Nascimento:")){
+                } else if (fragmento.startsWith("Nascimento:")) {
                     String dataEidade = fragmento.replace("Nascimento:", "").trim();
                     Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
-                    Matcher matcher = pattern.matcher(dataEidade);                    
-                    if(matcher.find()) {
+                    Matcher matcher = pattern.matcher(dataEidade);
+                    if (matcher.find()) {
                         String data = matcher.group().trim();
                         parteEnvolvida.setDataNascimento(data);
                         String idade = dataEidade.replace(data, "").trim();
                         parteEnvolvida.setIdade(idade);
                     }
-                    
-                }
-                else if(fragmento.startsWith("Estado Civil:")){
+                } else if (fragmento.startsWith("Estado Civil:")) {
                     parteEnvolvida.setEstadoCivil(fragmento.replace("Estado Civil:", "").trim());
-                }
-                else if(fragmento.startsWith("Profissão:")){
+                } else if (fragmento.startsWith("Profissão:")) {
                     parteEnvolvida.setProfissao(fragmento.replace("Profissão:", "").trim());
-                }
-                else if(fragmento.startsWith("Instrução:")){
+                } else if (fragmento.startsWith("Instrução:")) {
                     parteEnvolvida.setInstrucao(fragmento.replace("Instrução:", "").trim());
-                }
-                else if(fragmento.startsWith("Cutis:")){
+                } else if (fragmento.startsWith("Cutis:")) {
                     parteEnvolvida.setCutis(fragmento.replace("Cutis:", "").trim());
+                } else if (fragmento.startsWith("Naturezas Envolvidas:")) {
+                    parteEnvolvida.setNaturezasEnvolvidas(fragmento.replace("Naturezas Envolvidas:", "").trim());
                 }
             }
-            System.out.println(parteEnvolvida);
+            partes.add(parteEnvolvida);
         }
-        
+
         return partes;
     }
 
