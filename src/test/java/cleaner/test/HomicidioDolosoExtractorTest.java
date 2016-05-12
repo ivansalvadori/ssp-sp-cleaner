@@ -11,7 +11,7 @@ public class HomicidioDolosoExtractorTest {
     @Test
     public void homicidioDolosoExtractorTest() throws IOException {
         HomicidioDolosoExtractor extractor = new HomicidioDolosoExtractor();
-        extractor.parse("/home/ivan/Documents/Working/SSP-Datasets/HomicidioDoloso/2015/");
+        extractor.parse("/home/ivan/Documents/Working/SSP-Dataset/homicidioDoloso/2015", "/home/ivan/Documents/Working/SSP-Dataset/homicidioDoloso/2015/BOs/", "wvmuubkkllijo3s2lu4lsviw");
     }
 
 }

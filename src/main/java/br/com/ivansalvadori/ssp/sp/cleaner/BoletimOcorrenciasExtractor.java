@@ -23,7 +23,16 @@ public class BoletimOcorrenciasExtractor {
                 continue;
             }
 
-            Document doc = Jsoup.parse(file, "UTF-8", "http://example.com/");
+            Document doc = Jsoup.parse(file, "UTF-8");
+
+            String dependencia = doc.select("span:matchesOwn(Dependência:)").first().siblingElements().first().html();
+            boletimOcorrencia.setDependencia(dependencia);
+
+            String idDelegaciaENumeroBo = file.getName().replace(".html", "");
+            String[] split = idDelegaciaENumeroBo.split("-");
+            boletimOcorrencia.setIdDelegacia(split[0]);
+            boletimOcorrencia.setNumero(split[1]);
+
             Element divLocal = doc.select("div:matchesOwn(Local:)").get(0);
             Iterator<Element> iteratorDetalhes = divLocal.parent().parent().parent().getElementsByTag("div").iterator();
             while (iteratorDetalhes.hasNext()) {
@@ -78,6 +87,19 @@ public class BoletimOcorrenciasExtractor {
                     StringBuilder flagrante = new StringBuilder(iteratorDetalhes.next().html());
                     boletimOcorrencia.setFlagrante(flagrante.toString());
                 }
+            }
+
+            Element elementVitimas = doc.getElementsMatchingOwnText("((Vítima))").last();
+            System.out.println(elementVitimas.html());
+
+            Element elementExames = doc.getElementsContainingText("Exames requisitados:").last();
+            if (elementExames != null) {
+                boletimOcorrencia.setExamesRequisitados(elementExames.html().replace("Exames requisitados:", "").trim());
+            }
+
+            Element elementSolucao = doc.getElementsContainingText("Solução:").last();
+            if (elementSolucao != null) {
+                boletimOcorrencia.setSolucao(elementSolucao.html().replace("Solução:", "").trim());
             }
 
             System.out.println(boletimOcorrencia);

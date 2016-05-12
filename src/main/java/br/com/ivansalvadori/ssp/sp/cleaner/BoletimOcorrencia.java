@@ -4,6 +4,7 @@ import java.util.List;
 
 public class BoletimOcorrencia {
     private String numero;
+    private String idDelegacia;
     private String dependencia;
     private String local;
     private String tipoLocal;
@@ -134,6 +135,14 @@ public class BoletimOcorrencia {
     public String toString() {
         return "BoletimOcorrencia [numero=" + numero + ", dependencia=" + dependencia + ", local=" + local + ", tipoLocal=" + tipoLocal + ", circunscricao=" + circunscricao + ", dataOcorrencia=" + dataOcorrencia + ", dataComunicacao=" + dataComunicacao + ", horaComunicacao=" + horaComunicacao
                 + ", dataElaboracao=" + dataElaboracao + ", horaElaboracao=" + horaElaboracao + ", flagrante=" + flagrante + ", naturezas=" + naturezas + ", examesRequisitados=" + examesRequisitados + ", solucao=" + solucao + "]";
+    }
+
+    public String getIdDelegacia() {
+        return idDelegacia;
+    }
+
+    public void setIdDelegacia(String idDelegacia) {
+        this.idDelegacia = idDelegacia;
     }
 
 }
