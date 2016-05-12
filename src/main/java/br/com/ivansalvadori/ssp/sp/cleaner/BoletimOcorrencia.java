@@ -18,6 +18,7 @@ public class BoletimOcorrencia {
     private List<NaturezaBoletim> naturezas;
     private String examesRequisitados;
     private String solucao;
+    private List<ParteEnvolvida> partesEnvolvidas;
 
     public String getNumero() {
         return numero;
@@ -143,6 +144,14 @@ public class BoletimOcorrencia {
 
     public void setIdDelegacia(String idDelegacia) {
         this.idDelegacia = idDelegacia;
+    }
+
+    public List<ParteEnvolvida> getPartesEnvolvidas() {
+        return partesEnvolvidas;
+    }
+
+    public void setPartesEnvolvidas(List<ParteEnvolvida> partesEnvolvidas) {
+        this.partesEnvolvidas = partesEnvolvidas;
     }
 
 }
