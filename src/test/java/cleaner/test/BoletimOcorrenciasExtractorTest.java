@@ -11,7 +11,7 @@ public class BoletimOcorrenciasExtractorTest {
     @Test
     public void boExtractorTest() throws IOException {
         BoletimOcorrenciasExtractor extractor = new BoletimOcorrenciasExtractor();
-        extractor.parseDocument("/home/ivan/Downloads/bo");
+        extractor.parseDocument("/home/ivan/Documents/Working/SSP-Datasets/HomicidioDoloso/2015/RawData/BOs");
     }
 
 }

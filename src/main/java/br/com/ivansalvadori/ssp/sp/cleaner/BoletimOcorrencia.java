@@ -11,7 +11,7 @@ public class BoletimOcorrencia {
     private String tipoLocal;
     private String circunscricao;
     private String dataOcorrencia;
-    private String turnoOcorrecenia;
+    private String turnoOcorrencia;
     private String dataComunicacao;
     private String horaComunicacao;
     private String dataElaboracao;
@@ -24,7 +24,7 @@ public class BoletimOcorrencia {
 
     @Override
     public String toString() {
-        return "BoletimOcorrencia [numero=" + numero + ", idDelegacia=" + idDelegacia + ", dependencia=" + dependencia + ", local=" + local + ", tipoLocal=" + tipoLocal + ", circunscricao=" + circunscricao + ", dataOcorrencia=" + dataOcorrencia + ", turnoOcorrecenia=" + turnoOcorrecenia
+        return "BoletimOcorrencia [numero=" + numero + ", idDelegacia=" + idDelegacia + ", dependencia=" + dependencia + ", local=" + local + ", tipoLocal=" + tipoLocal + ", circunscricao=" + circunscricao + ", dataOcorrencia=" + dataOcorrencia + ", turnoOcorrencia=" + turnoOcorrencia
                 + ", dataComunicacao=" + dataComunicacao + ", horaComunicacao=" + horaComunicacao + ", dataElaboracao=" + dataElaboracao + ", horaElaboracao=" + horaElaboracao + ", flagrante=" + flagrante + ", examesRequisitados=" + examesRequisitados + ", solucao=" + solucao + ", partesEnvolvidas="
                 + partesEnvolvidas + ", naturezas=" + naturezas + "]";
     }
@@ -149,20 +149,20 @@ public class BoletimOcorrencia {
         this.partesEnvolvidas = partesEnvolvidas;
     }
 
-    public String getTurnoOcorrecenia() {
-        return turnoOcorrecenia;
-    }
-
-    public void setTurnoOcorrecenia(String turnoOcorrecenia) {
-        this.turnoOcorrecenia = turnoOcorrecenia;
-    }
-
     public List<NaturezaBoletim> getNaturezas() {
         return naturezas;
     }
 
     public void setNaturezas(List<NaturezaBoletim> naturezas) {
         this.naturezas = naturezas;
+    }
+
+    public String getTurnoOcorrencia() {
+        return turnoOcorrencia;
+    }
+
+    public void setTurnoOcorrencia(String turnoOcorrencia) {
+        this.turnoOcorrencia = turnoOcorrencia;
     }
 
 }

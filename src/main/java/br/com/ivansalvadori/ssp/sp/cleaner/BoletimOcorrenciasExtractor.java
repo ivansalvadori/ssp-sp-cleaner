@@ -23,12 +23,12 @@ import com.google.gson.GsonBuilder;
 public class BoletimOcorrenciasExtractor {
 
     public void parseDocument(String folderPath) throws IOException {
-        BoletimOcorrencia boletimOcorrencia = new BoletimOcorrencia();
         File[] files = new File(folderPath).listFiles();
         for (File file : files) {
             if (!file.isFile()) {
                 continue;
             }
+            BoletimOcorrencia boletimOcorrencia = new BoletimOcorrencia();
 
             Document doc = Jsoup.parse(file, "UTF-8");
 
@@ -81,8 +81,17 @@ public class BoletimOcorrenciasExtractor {
                     boletimOcorrencia.setCircunscricao(circunscricao.toString());
                 }
                 if (textoDetalhe.equalsIgnoreCase("Ocorrência:")) {
-                    StringBuilder ocorrencia = new StringBuilder(iteratorDetalhes.next().html());
-                    boletimOcorrencia.setDataOcorrencia(ocorrencia.toString());
+                    StringBuilder ocorrenciaDataEturno = new StringBuilder(iteratorDetalhes.next().html());
+
+                    Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
+                    Matcher matcher = pattern.matcher(ocorrenciaDataEturno.toString());
+                    if (matcher.find()) {
+                        String data = matcher.group();
+                        boletimOcorrencia.setDataOcorrencia(data);
+                        String turno = ocorrenciaDataEturno.toString().replace(data, "").trim();
+                        boletimOcorrencia.setTurnoOcorrencia(turno);
+                    }
+
                 }
                 if (textoDetalhe.equalsIgnoreCase("Comunicação:")) {
                     StringBuilder comunicacao = new StringBuilder(iteratorDetalhes.next().html());
@@ -131,7 +140,7 @@ public class BoletimOcorrenciasExtractor {
                 boletimOcorrencia.setSolucao(elementSolucao.html().replace("Solução:", "").trim());
             }
 
-            try (Writer writer = new FileWriter(file.getCanonicalFile() + ".json")) {
+            try (Writer writer = new FileWriter(file.getCanonicalFile().toString().replace(".html", "") + ".json")) {
                 Gson gson = new GsonBuilder().create();
                 gson.toJson(boletimOcorrencia, writer);
             }
