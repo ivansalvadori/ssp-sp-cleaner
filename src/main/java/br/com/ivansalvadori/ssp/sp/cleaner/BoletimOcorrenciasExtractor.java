@@ -20,10 +20,14 @@ import org.jsoup.select.Elements;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import au.com.bytecode.opencsv.CSVWriter;
+
 public class BoletimOcorrenciasExtractor {
 
-    public void parseDocument(String folderPath) throws IOException {
-        File[] files = new File(folderPath).listFiles();
+    private List<BoletimOcorrencia> boletinsProcessados = new ArrayList<>();
+
+    public void parseDocument(String folderPathInput, String folderPathOutput) throws IOException {
+        File[] files = new File(folderPathInput).listFiles();
         for (File file : files) {
             if (!file.isFile()) {
                 continue;
@@ -37,8 +41,8 @@ public class BoletimOcorrenciasExtractor {
 
             String idDelegaciaENumeroBo = file.getName().replace(".html", "");
             String[] split = idDelegaciaENumeroBo.split("-");
-            boletimOcorrencia.setIdDelegacia(split[0]);
-            boletimOcorrencia.setNumero(split[1]);
+            boletimOcorrencia.setIdDelegacia(split[0].replace("BO_", ""));
+            boletimOcorrencia.setNumero(split[1].trim());
 
             Elements divEspecie = doc.select("div:matchesOwn(Espécie:)");
             Iterator<Element> divEspecieIterator = divEspecie.iterator();
@@ -140,12 +144,20 @@ public class BoletimOcorrenciasExtractor {
                 boletimOcorrencia.setSolucao(elementSolucao.html().replace("Solução:", "").trim());
             }
 
-            try (Writer writer = new FileWriter(file.getCanonicalFile().toString().replace(".html", "") + ".json")) {
-                Gson gson = new GsonBuilder().create();
-                gson.toJson(boletimOcorrencia, writer);
-            }
+            boletinsProcessados.add(boletimOcorrencia);
+            new CsvProcessor().gravarCSV(boletinsProcessados, folderPathOutput);
+
+            gravarEmJson(folderPathOutput, file, boletimOcorrencia);
+
         }
 
+    }
+
+    private void gravarEmJson(String folderPathOutput, File file, BoletimOcorrencia boletimOcorrencia) throws IOException {
+        try (Writer writer = new FileWriter(folderPathOutput + file.getName().toString().replace(".html", "") + ".json")) {
+            Gson gson = new GsonBuilder().create();
+            gson.toJson(boletimOcorrencia, writer);
+        }
     }
 
     private List<ParteEnvolvida> parsePartesEnvolvidas(Document doc) {
@@ -161,11 +173,13 @@ public class BoletimOcorrenciasExtractor {
 
             String nomeAndTipoEnvolvimento = fragmentos.get(0);
 
+            String nome = null;
+
             Matcher macherTipoEnvolvimento = Pattern.compile("\\(([^)]+)\\)").matcher(nomeAndTipoEnvolvimento);
             while (macherTipoEnvolvimento.find()) {
                 String tipoEnvolvimento = macherTipoEnvolvimento.group(1);
                 parteEnvolvida.setTipoEnvolvimento(tipoEnvolvimento);
-                String nome = nomeAndTipoEnvolvimento.replace("(" + tipoEnvolvimento + ")", "").trim();
+                nome = nomeAndTipoEnvolvimento.replace("(" + tipoEnvolvimento + ")", "").trim();
                 parteEnvolvida.setNome(nome);
             }
 
@@ -177,7 +191,26 @@ public class BoletimOcorrenciasExtractor {
                 } else if (fragmento.startsWith("Nacionalidade:")) {
                     parteEnvolvida.setNacionalidade(fragmento.replace("Nacionalidade:", "").trim());
                 } else if (fragmento.startsWith("Sexo:")) {
-                    parteEnvolvida.setSexo(fragmento.replace("Sexo:", "").trim());
+
+                    String sexo = fragmento.replace("Sexo:", "").trim();
+
+                    if (sexo.replace("Masculino", "").trim().length() > 0 || sexo.replace("Feminino", "").trim().length() > 0) {
+                        String sexoEidade = sexo;
+                        String idade = null;
+                        if (sexoEidade.contains("Feminino")) {
+                            idade = sexoEidade.replace("Feminino", "").replace("anos", "").trim();
+                            parteEnvolvida.setSexo("Feminino");
+                        }
+                        if (sexoEidade.contains("Masculino")) {
+                            idade = sexoEidade.replace("Masculino", "").replace("anos", "").trim();
+                            parteEnvolvida.setSexo("Masculino");
+                        }
+
+                    } else {
+                        parteEnvolvida.setSexo(sexo);
+
+                    }
+
                 } else if (fragmento.startsWith("Nascimento:")) {
                     String dataEidade = fragmento.replace("Nascimento:", "").trim();
                     Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
@@ -185,7 +218,7 @@ public class BoletimOcorrenciasExtractor {
                     if (matcher.find()) {
                         String data = matcher.group().trim();
                         parteEnvolvida.setDataNascimento(data);
-                        String idade = dataEidade.replace(data, "").trim();
+                        String idade = dataEidade.replace(data, "").replace("anos", "").trim();
                         parteEnvolvida.setIdade(idade);
                     }
                 } else if (fragmento.startsWith("Estado Civil:")) {

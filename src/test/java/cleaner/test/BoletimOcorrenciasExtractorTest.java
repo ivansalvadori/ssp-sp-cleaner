@@ -11,7 +11,9 @@ public class BoletimOcorrenciasExtractorTest {
     @Test
     public void boExtractorTest() throws IOException {
         BoletimOcorrenciasExtractor extractor = new BoletimOcorrenciasExtractor();
-        extractor.parseDocument("/home/ivan/Documents/Working/SSP-Datasets/HomicidioDoloso/2015/RawData/BOs");
+        String input = "/home/ivan/Documents/Working/SSP-Datasets/HomicidioDoloso/2015/Jan/RawData/BOs";
+        String output = "/home/ivan/Documents/Working/SSP-Datasets/HomicidioDoloso/2015/Jan/BOs/";
+        extractor.parseDocument(input, output);
     }
 
 }

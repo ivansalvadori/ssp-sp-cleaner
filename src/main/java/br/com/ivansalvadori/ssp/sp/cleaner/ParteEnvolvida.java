@@ -119,10 +119,11 @@ public class ParteEnvolvida {
         this.naturezasEnvolvidas = naturezasEnvolvidas;
     }
 
-    @Override
-    public String toString() {
-        return "ParteEnvolvida [nome=" + nome + ", tipoEnvolvimento=" + tipoEnvolvimento + ", rg=" + rg + ", naturalidade=" + naturalidade + ", nacionalidade=" + nacionalidade + ", sexo=" + sexo + ", dataNascimento=" + dataNascimento + ", idade=" + idade + ", estadoCivil=" + estadoCivil
-                + ", instrucao=" + instrucao + ", profissao=" + profissao + ", cutis=" + cutis + ", naturezasEnvolvidas=" + naturezasEnvolvidas + "]";
+    public String printCSV() {
+        return  nome + "#" + tipoEnvolvimento + "#" + rg + "#" + naturalidade + "#" + nacionalidade + "#" + sexo + "#" + dataNascimento + "#" + idade + "#" + estadoCivil
+                + "#" + instrucao + "#" + profissao + "#" + cutis + "#" + naturezasEnvolvidas;
     }
+    
+
 
 }

@@ -4,23 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoletimOcorrencia {
-    private String numero;
-    private String idDelegacia;
-    private String dependencia;
-    private String local;
-    private String tipoLocal;
-    private String circunscricao;
-    private String dataOcorrencia;
-    private String turnoOcorrencia;
-    private String dataComunicacao;
-    private String horaComunicacao;
-    private String dataElaboracao;
-    private String horaElaboracao;
-    private String flagrante;
-    private String examesRequisitados;
-    private String solucao;
-    private List<ParteEnvolvida> partesEnvolvidas = new ArrayList<>();
-    private List<NaturezaBoletim> naturezas = new ArrayList<>();
+    protected String numero;
+    protected String idDelegacia;
+    protected String dependencia;
+    protected String local;
+    protected String tipoLocal;
+    protected String circunscricao;
+    protected String dataOcorrencia;
+    protected String turnoOcorrencia;
+    protected String dataComunicacao;
+    protected String horaComunicacao;
+    protected String dataElaboracao;
+    protected String horaElaboracao;
+    protected String flagrante;
+    protected String examesRequisitados;
+    protected String solucao;
+    protected List<ParteEnvolvida> partesEnvolvidas = new ArrayList<>();
+    protected List<NaturezaBoletim> naturezas = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -163,6 +163,10 @@ public class BoletimOcorrencia {
 
     public void setTurnoOcorrencia(String turnoOcorrencia) {
         this.turnoOcorrencia = turnoOcorrencia;
+    }
+    
+    public String printCSV() {
+        return numero + "#" + idDelegacia + "#" + dependencia + "#" + local + "#" + tipoLocal + "#" + circunscricao + "#" + dataOcorrencia + "#" + turnoOcorrencia + "#" + dataComunicacao + "#" + horaComunicacao + "#" + dataElaboracao + "#" + horaElaboracao + "#" + flagrante + "#" + examesRequisitados + "#" + solucao;
     }
 
 }
