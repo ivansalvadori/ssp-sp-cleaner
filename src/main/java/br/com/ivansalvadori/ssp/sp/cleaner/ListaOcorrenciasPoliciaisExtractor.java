@@ -17,8 +17,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.stereotype.Component;
 
-public class HomicidioDolosoExtractor {
+@Component
+public class ListaOcorrenciasPoliciaisExtractor {
 
     public void parse(String pastaPaginasHomicidios, String pastaGravacaoBos, String sessionId) throws IOException {
         File[] files = new File(pastaPaginasHomicidios).listFiles();

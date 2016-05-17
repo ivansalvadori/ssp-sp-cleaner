@@ -35,4 +35,8 @@ public class NaturezaBoletim {
         return "NaturezaBoletim [especie=" + especie + ", descricao=" + descricao + ", desdobramentos=" + desdobramentos + "]";
     }
 
+    public String printCSV() {
+        return especie + "#" + descricao + "#" + desdobramentos;
+    }
+
 }

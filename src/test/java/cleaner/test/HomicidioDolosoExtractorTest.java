@@ -4,14 +4,17 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import br.com.ivansalvadori.ssp.sp.cleaner.HomicidioDolosoExtractor;
+import br.com.ivansalvadori.ssp.sp.cleaner.ListaOcorrenciasPoliciaisExtractor;
 
 public class HomicidioDolosoExtractorTest {
 
     @Test
     public void homicidioDolosoExtractorTest() throws IOException {
-        HomicidioDolosoExtractor extractor = new HomicidioDolosoExtractor();
-        extractor.parse("/home/ivan/Documents/Working/SSP-Dataset/homicidioDoloso/2015", "/home/ivan/Documents/Working/SSP-Dataset/homicidioDoloso/2015/BOs/", "wvmuubkkllijo3s2lu4lsviw");
+        ListaOcorrenciasPoliciaisExtractor extractor = new ListaOcorrenciasPoliciaisExtractor();
+        String pastaPaginasHomicidios = "/home/ivan/Documents/Working/SSP-Datasets/HomicidioDoloso/2015/Fev/RawData/";
+        String pastaGravacaoBos = "/home/ivan/Documents/Working/SSP-Datasets/HomicidioDoloso/2015/Fev/RawData/BOs/";
+        String sessionId = "wvmuubkkllijo3s2lu4lsviw";
+        extractor.parse(pastaPaginasHomicidios, pastaGravacaoBos, sessionId);
     }
 
 }

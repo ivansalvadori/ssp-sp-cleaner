@@ -16,12 +16,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import au.com.bytecode.opencsv.CSVWriter;
-
+@Component
 public class BoletimOcorrenciasExtractor {
 
     private List<BoletimOcorrencia> boletinsProcessados = new ArrayList<>();
@@ -41,8 +41,16 @@ public class BoletimOcorrenciasExtractor {
 
             String idDelegaciaENumeroBo = file.getName().replace(".html", "");
             String[] split = idDelegaciaENumeroBo.split("-");
-            boletimOcorrencia.setIdDelegacia(split[0].replace("BO_", ""));
+            String ideDelegacia = split[0].replace("BO_", "");
+            boletimOcorrencia.setIdDelegacia(ideDelegacia);
             boletimOcorrencia.setNumero(split[1].trim());
+
+            String numeroBoBarraAno = doc.select("span:matchesOwn(Boletim No.:)").first().siblingElements().first().html();
+            String numeroInformado = numeroBoBarraAno.split("/")[0];
+            String anoBo = numeroBoBarraAno.split("/")[1];
+            String formatoIdBo = "%s-%s-%s";
+            String idBO = String.format(formatoIdBo, anoBo, ideDelegacia, numeroInformado);
+            boletimOcorrencia.setIdBO(idBO);
 
             Elements divEspecie = doc.select("div:matchesOwn(Espécie:)");
             Iterator<Element> divEspecieIterator = divEspecie.iterator();
@@ -66,8 +74,19 @@ public class BoletimOcorrenciasExtractor {
                 boletimOcorrencia.getNaturezas().add(naturezaBoletim);
             }
 
-            Element divLocal = doc.select("div:matchesOwn(Local:)").get(0);
-            Iterator<Element> iteratorDetalhes = divLocal.parent().parent().parent().getElementsByTag("div").iterator();
+            System.out.println("processando: " + file.getName());
+
+            Element divInfoDetalhes = null;
+
+            if (doc.select("div:matchesOwn(Local:)").size() > 0) {
+                divInfoDetalhes = doc.select("div:matchesOwn(Local:)").get(0);
+            }
+
+            else if (doc.select("div:matchesOwn(Circunscrição:)").size() > 0) {
+                divInfoDetalhes = doc.select("div:matchesOwn(Circunscrição:)").get(0);
+            }
+
+            Iterator<Element> iteratorDetalhes = divInfoDetalhes.parent().parent().parent().getElementsByTag("div").iterator();
             while (iteratorDetalhes.hasNext()) {
                 String textoDetalhe = iteratorDetalhes.next().html();
                 if (textoDetalhe.equalsIgnoreCase("Local:")) {
@@ -154,7 +173,7 @@ public class BoletimOcorrenciasExtractor {
     }
 
     private void gravarEmJson(String folderPathOutput, File file, BoletimOcorrencia boletimOcorrencia) throws IOException {
-        try (Writer writer = new FileWriter(folderPathOutput + file.getName().toString().replace(".html", "") + ".json")) {
+        try (Writer writer = new FileWriter(folderPathOutput + boletimOcorrencia.getIdBO() + ".json")) {
             Gson gson = new GsonBuilder().create();
             gson.toJson(boletimOcorrencia, writer);
         }
@@ -200,15 +219,14 @@ public class BoletimOcorrenciasExtractor {
                         if (sexoEidade.contains("Feminino")) {
                             idade = sexoEidade.replace("Feminino", "").replace("anos", "").trim();
                             parteEnvolvida.setSexo("Feminino");
-                        }
-                        if (sexoEidade.contains("Masculino")) {
+                        } else if (sexoEidade.contains("Masculino")) {
                             idade = sexoEidade.replace("Masculino", "").replace("anos", "").trim();
                             parteEnvolvida.setSexo("Masculino");
                         }
+                        parteEnvolvida.setIdade(idade);
 
                     } else {
                         parteEnvolvida.setSexo(sexo);
-
                     }
 
                 } else if (fragmento.startsWith("Nascimento:")) {

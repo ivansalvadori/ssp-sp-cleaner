@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoletimOcorrencia {
+    protected String idBO;
     protected String numero;
     protected String idDelegacia;
     protected String dependencia;
@@ -21,13 +22,6 @@ public class BoletimOcorrencia {
     protected String solucao;
     protected List<ParteEnvolvida> partesEnvolvidas = new ArrayList<>();
     protected List<NaturezaBoletim> naturezas = new ArrayList<>();
-
-    @Override
-    public String toString() {
-        return "BoletimOcorrencia [numero=" + numero + ", idDelegacia=" + idDelegacia + ", dependencia=" + dependencia + ", local=" + local + ", tipoLocal=" + tipoLocal + ", circunscricao=" + circunscricao + ", dataOcorrencia=" + dataOcorrencia + ", turnoOcorrencia=" + turnoOcorrencia
-                + ", dataComunicacao=" + dataComunicacao + ", horaComunicacao=" + horaComunicacao + ", dataElaboracao=" + dataElaboracao + ", horaElaboracao=" + horaElaboracao + ", flagrante=" + flagrante + ", examesRequisitados=" + examesRequisitados + ", solucao=" + solucao + ", partesEnvolvidas="
-                + partesEnvolvidas + ", naturezas=" + naturezas + "]";
-    }
 
     public String getNumero() {
         return numero;
@@ -164,9 +158,18 @@ public class BoletimOcorrencia {
     public void setTurnoOcorrencia(String turnoOcorrencia) {
         this.turnoOcorrencia = turnoOcorrencia;
     }
-    
+
+    public void setIdBO(String idBO) {
+        this.idBO = idBO;
+    }
+
+    public String getIdBO() {
+        return idBO;
+    }
+
     public String printCSV() {
-        return numero + "#" + idDelegacia + "#" + dependencia + "#" + local + "#" + tipoLocal + "#" + circunscricao + "#" + dataOcorrencia + "#" + turnoOcorrencia + "#" + dataComunicacao + "#" + horaComunicacao + "#" + dataElaboracao + "#" + horaElaboracao + "#" + flagrante + "#" + examesRequisitados + "#" + solucao;
+        return idBO + "#" + numero + "#" + idDelegacia + "#" + dependencia + "#" + local + "#" + tipoLocal + "#" + circunscricao + "#" + dataOcorrencia + "#" + turnoOcorrencia + "#" + dataComunicacao + "#" + horaComunicacao + "#" + dataElaboracao + "#" + horaElaboracao + "#" + flagrante + "#"
+                + examesRequisitados + "#" + solucao;
     }
 
 }
