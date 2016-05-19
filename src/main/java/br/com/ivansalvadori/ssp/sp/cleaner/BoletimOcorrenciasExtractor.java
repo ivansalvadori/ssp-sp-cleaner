@@ -24,237 +24,250 @@ import com.google.gson.GsonBuilder;
 @Component
 public class BoletimOcorrenciasExtractor {
 
-    private List<BoletimOcorrencia> boletinsProcessados = new ArrayList<>();
+	private List<BoletimOcorrencia> boletinsProcessados = new ArrayList<>();
 
-    public void parseDocument(String folderPathInput, String folderPathOutput) throws IOException {
-        File[] files = new File(folderPathInput).listFiles();
-        for (File file : files) {
-            if (!file.isFile()) {
-                continue;
-            }
-            BoletimOcorrencia boletimOcorrencia = new BoletimOcorrencia();
+	public void parseDocument(String folderPathInput, String folderPathOutput) throws IOException {
+		File[] files = new File(folderPathInput).listFiles();
+		for (File file : files) {
+			if (!file.isFile()) {
+				continue;
+			}
 
-            Document doc = Jsoup.parse(file, "UTF-8");
+			try {
 
-            String dependencia = doc.select("span:matchesOwn(Dependência:)").first().siblingElements().first().html();
-            boletimOcorrencia.setDependencia(dependencia);
+				BoletimOcorrencia boletimOcorrencia = new BoletimOcorrencia();
 
-            String idDelegaciaENumeroBo = file.getName().replace(".html", "");
-            String[] split = idDelegaciaENumeroBo.split("-");
-            String ideDelegacia = split[0].replace("BO_", "");
-            boletimOcorrencia.setIdDelegacia(ideDelegacia);
-            boletimOcorrencia.setNumero(split[1].trim());
+				Document doc = Jsoup.parse(file, "UTF-8");
 
-            String numeroBoBarraAno = doc.select("span:matchesOwn(Boletim No.:)").first().siblingElements().first().html();
-            String numeroInformado = numeroBoBarraAno.split("/")[0];
-            String anoBo = numeroBoBarraAno.split("/")[1];
-            String formatoIdBo = "%s-%s-%s";
-            String idBO = String.format(formatoIdBo, anoBo, ideDelegacia, numeroInformado);
-            boletimOcorrencia.setIdBO(idBO);
+				String dependencia = doc.select("span:matchesOwn(Dependência:)").first().siblingElements().first()
+						.html();
+				boletimOcorrencia.setDependencia(dependencia);
 
-            Elements divEspecie = doc.select("div:matchesOwn(Espécie:)");
-            Iterator<Element> divEspecieIterator = divEspecie.iterator();
-            while (divEspecieIterator.hasNext()) {
-                NaturezaBoletim naturezaBoletim = new NaturezaBoletim();
+				String idDelegaciaENumeroBo = file.getName().replace(".html", "");
+				String[] split = idDelegaciaENumeroBo.split("-");
+				String ideDelegacia = split[0].replace("BO_", "");
+				boletimOcorrencia.setIdDelegacia(ideDelegacia);
+				boletimOcorrencia.setNumero(split[1].trim());
 
-                Element natureza = divEspecieIterator.next();
-                String especie = natureza.parent().siblingElements().get(0).child(0).html().trim();
-                naturezaBoletim.setEspecie(especie);
+				String numeroBoBarraAno = doc.select("span:matchesOwn(Boletim No.:)").first().siblingElements().first()
+						.html();
+				String numeroInformado = numeroBoBarraAno.split("/")[0];
+				String anoBo = numeroBoBarraAno.split("/")[1];
+				String formatoIdBo = "%s-%s-%s";
+				String idBO = String.format(formatoIdBo, anoBo, ideDelegacia, numeroInformado);
+				boletimOcorrencia.setIdBO(idBO);
 
-                Node nodoNatureza = natureza.parent().parent().nextSibling();
-                String descricao = nodoNatureza.childNode(1).childNode(0).childNode(0).toString().trim();
-                naturezaBoletim.setDescricao(descricao);
+				Elements divEspecie = doc.select("div:matchesOwn(Espécie:)");
+				Iterator<Element> divEspecieIterator = divEspecie.iterator();
+				while (divEspecieIterator.hasNext()) {
+					NaturezaBoletim naturezaBoletim = new NaturezaBoletim();
 
-                Node nodoConsumado = nodoNatureza.nextSibling();
-                Node nodoDesdobramentos = nodoConsumado.nextSibling();
-                if (nodoDesdobramentos.childNode(0).childNode(0).childNodeSize() > 0) {
-                    String desdobramentos = nodoDesdobramentos.childNode(1).childNode(0).childNode(0).toString().trim();
-                    naturezaBoletim.setDesdobramentos(desdobramentos);
-                }
-                boletimOcorrencia.getNaturezas().add(naturezaBoletim);
-            }
+					Element natureza = divEspecieIterator.next();
+					String especie = natureza.parent().siblingElements().get(0).child(0).html().trim();
+					naturezaBoletim.setEspecie(especie);
 
-            System.out.println("processando: " + file.getName());
+					Node nodoNatureza = natureza.parent().parent().nextSibling();
+					String descricao = nodoNatureza.childNode(1).childNode(0).childNode(0).toString().trim();
+					naturezaBoletim.setDescricao(descricao);
 
-            Element divInfoDetalhes = null;
+					Node nodoConsumado = nodoNatureza.nextSibling();
+					Node nodoDesdobramentos = nodoConsumado.nextSibling();
+					if (nodoDesdobramentos.childNode(0).childNode(0).childNodeSize() > 0) {
+						String desdobramentos = nodoDesdobramentos.childNode(1).childNode(0).childNode(0).toString()
+								.trim();
+						naturezaBoletim.setDesdobramentos(desdobramentos);
+					}
+					boletimOcorrencia.getNaturezas().add(naturezaBoletim);
+				}
 
-            if (doc.select("div:matchesOwn(Local:)").size() > 0) {
-                divInfoDetalhes = doc.select("div:matchesOwn(Local:)").get(0);
-            }
+				System.out.println("processando: " + file.getName());
 
-            else if (doc.select("div:matchesOwn(Circunscrição:)").size() > 0) {
-                divInfoDetalhes = doc.select("div:matchesOwn(Circunscrição:)").get(0);
-            }
+				Element divInfoDetalhes = null;
 
-            Iterator<Element> iteratorDetalhes = divInfoDetalhes.parent().parent().parent().getElementsByTag("div").iterator();
-            while (iteratorDetalhes.hasNext()) {
-                String textoDetalhe = iteratorDetalhes.next().html();
-                if (textoDetalhe.equalsIgnoreCase("Local:")) {
-                    StringBuilder local = new StringBuilder(iteratorDetalhes.next().html());
-                    local.append(" - ");
-                    local.append(iteratorDetalhes.next().html());
-                    boletimOcorrencia.setLocal(local.toString());
-                }
-                if (textoDetalhe.equalsIgnoreCase("Tipo de Local:")) {
-                    StringBuilder tipoLocal = new StringBuilder(iteratorDetalhes.next().html());
-                    boletimOcorrencia.setTipoLocal(tipoLocal.toString());
-                }
-                if (textoDetalhe.equalsIgnoreCase("Circunscrição:")) {
-                    StringBuilder circunscricao = new StringBuilder(iteratorDetalhes.next().html());
-                    boletimOcorrencia.setCircunscricao(circunscricao.toString());
-                }
-                if (textoDetalhe.equalsIgnoreCase("Ocorrência:")) {
-                    StringBuilder ocorrenciaDataEturno = new StringBuilder(iteratorDetalhes.next().html());
+				if (doc.select("div:matchesOwn(Local:)").size() > 0) {
+					divInfoDetalhes = doc.select("div:matchesOwn(Local:)").get(0);
+				}
 
-                    Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
-                    Matcher matcher = pattern.matcher(ocorrenciaDataEturno.toString());
-                    if (matcher.find()) {
-                        String data = matcher.group();
-                        boletimOcorrencia.setDataOcorrencia(data);
-                        String turno = ocorrenciaDataEturno.toString().replace(data, "").trim();
-                        boletimOcorrencia.setTurnoOcorrencia(turno);
-                    }
+				else if (doc.select("div:matchesOwn(Circunscrição:)").size() > 0) {
+					divInfoDetalhes = doc.select("div:matchesOwn(Circunscrição:)").get(0);
+				}
 
-                }
-                if (textoDetalhe.equalsIgnoreCase("Comunicação:")) {
-                    StringBuilder comunicacao = new StringBuilder(iteratorDetalhes.next().html());
-                    Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
-                    Matcher matcher = pattern.matcher(comunicacao);
-                    if (matcher.find()) {
-                        String data = matcher.group();
-                        boletimOcorrencia.setDataComunicacao(data);
-                        String comunicacaoCompleta = comunicacao.toString();
-                        String hora = comunicacaoCompleta.replace(data, "");
-                        hora = hora.replace("às", "");
-                        hora = hora.replace("horas", "");
-                        boletimOcorrencia.setHoraComunicacao(hora.trim());
-                    }
-                }
-                if (textoDetalhe.equalsIgnoreCase("Elaboração:")) {
-                    StringBuilder elaboracao = new StringBuilder(iteratorDetalhes.next().html());
-                    Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
-                    Matcher matcher = pattern.matcher(elaboracao);
-                    if (matcher.find()) {
-                        String data = matcher.group();
-                        boletimOcorrencia.setDataElaboracao(data);
-                        String elaboracaoCompleta = elaboracao.toString();
-                        String hora = elaboracaoCompleta.replace(data, "");
-                        hora = hora.replace("às", "");
-                        hora = hora.replace("horas", "");
-                        boletimOcorrencia.setHoraElaboracao(hora.trim());
-                    }
-                }
-                if (textoDetalhe.equalsIgnoreCase("Flagrante:")) {
-                    StringBuilder flagrante = new StringBuilder(iteratorDetalhes.next().html());
-                    boletimOcorrencia.setFlagrante(flagrante.toString());
-                }
-            }
+				Iterator<Element> iteratorDetalhes = divInfoDetalhes.parent().parent().parent().getElementsByTag("div")
+						.iterator();
+				while (iteratorDetalhes.hasNext()) {
+					String textoDetalhe = iteratorDetalhes.next().html();
+					if (textoDetalhe.equalsIgnoreCase("Local:")) {
+						StringBuilder local = new StringBuilder(iteratorDetalhes.next().html());
+						local.append(" - ");
+						local.append(iteratorDetalhes.next().html());
+						boletimOcorrencia.setLocal(local.toString());
+					}
+					if (textoDetalhe.equalsIgnoreCase("Tipo de Local:")) {
+						StringBuilder tipoLocal = new StringBuilder(iteratorDetalhes.next().html());
+						boletimOcorrencia.setTipoLocal(tipoLocal.toString());
+					}
+					if (textoDetalhe.equalsIgnoreCase("Circunscrição:")) {
+						StringBuilder circunscricao = new StringBuilder(iteratorDetalhes.next().html());
+						boletimOcorrencia.setCircunscricao(circunscricao.toString());
+					}
+					if (textoDetalhe.equalsIgnoreCase("Ocorrência:")) {
+						StringBuilder ocorrenciaDataEturno = new StringBuilder(iteratorDetalhes.next().html());
 
-            List<ParteEnvolvida> partesEnvolvidas = parsePartesEnvolvidas(doc);
-            boletimOcorrencia.setPartesEnvolvidas(partesEnvolvidas);
+						Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
+						Matcher matcher = pattern.matcher(ocorrenciaDataEturno.toString());
+						if (matcher.find()) {
+							String data = matcher.group();
+							boletimOcorrencia.setDataOcorrencia(data);
+							String turno = ocorrenciaDataEturno.toString().replace(data, "").trim();
+							boletimOcorrencia.setTurnoOcorrencia(turno);
+						}
 
-            Element elementExames = doc.getElementsContainingText("Exames requisitados:").last();
-            if (elementExames != null) {
-                boletimOcorrencia.setExamesRequisitados(elementExames.html().replace("Exames requisitados:", "").trim());
-            }
+					}
+					if (textoDetalhe.equalsIgnoreCase("Comunicação:")) {
+						StringBuilder comunicacao = new StringBuilder(iteratorDetalhes.next().html());
+						Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
+						Matcher matcher = pattern.matcher(comunicacao);
+						if (matcher.find()) {
+							String data = matcher.group();
+							boletimOcorrencia.setDataComunicacao(data);
+							String comunicacaoCompleta = comunicacao.toString();
+							String hora = comunicacaoCompleta.replace(data, "");
+							hora = hora.replace("às", "");
+							hora = hora.replace("horas", "");
+							boletimOcorrencia.setHoraComunicacao(hora.trim());
+						}
+					}
+					if (textoDetalhe.equalsIgnoreCase("Elaboração:")) {
+						StringBuilder elaboracao = new StringBuilder(iteratorDetalhes.next().html());
+						Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
+						Matcher matcher = pattern.matcher(elaboracao);
+						if (matcher.find()) {
+							String data = matcher.group();
+							boletimOcorrencia.setDataElaboracao(data);
+							String elaboracaoCompleta = elaboracao.toString();
+							String hora = elaboracaoCompleta.replace(data, "");
+							hora = hora.replace("às", "");
+							hora = hora.replace("horas", "");
+							boletimOcorrencia.setHoraElaboracao(hora.trim());
+						}
+					}
+					if (textoDetalhe.equalsIgnoreCase("Flagrante:")) {
+						StringBuilder flagrante = new StringBuilder(iteratorDetalhes.next().html());
+						boletimOcorrencia.setFlagrante(flagrante.toString());
+					}
+				}
 
-            Element elementSolucao = doc.getElementsContainingText("Solução:").last();
-            if (elementSolucao != null) {
-                boletimOcorrencia.setSolucao(elementSolucao.html().replace("Solução:", "").trim());
-            }
+				List<ParteEnvolvida> partesEnvolvidas = parsePartesEnvolvidas(doc);
+				boletimOcorrencia.setPartesEnvolvidas(partesEnvolvidas);
 
-            boletinsProcessados.add(boletimOcorrencia);
-            new CsvProcessor().gravarCSV(boletinsProcessados, folderPathOutput);
+				Element elementExames = doc.getElementsContainingText("Exames requisitados:").last();
+				if (elementExames != null) {
+					boletimOcorrencia
+							.setExamesRequisitados(elementExames.html().replace("Exames requisitados:", "").trim());
+				}
 
-            gravarEmJson(folderPathOutput, file, boletimOcorrencia);
+				Element elementSolucao = doc.getElementsContainingText("Solução:").last();
+				if (elementSolucao != null) {
+					boletimOcorrencia.setSolucao(elementSolucao.html().replace("Solução:", "").trim());
+				}
 
-        }
+				boletinsProcessados.add(boletimOcorrencia);
+				new CsvProcessor().gravarCSV(boletinsProcessados, folderPathOutput);
 
-    }
+				gravarEmJson(folderPathOutput, file, boletimOcorrencia);
+			} catch (Exception e) {
+				System.out.println("BO não processado:" + file.getName());
+			}
 
-    private void gravarEmJson(String folderPathOutput, File file, BoletimOcorrencia boletimOcorrencia) throws IOException {
-        try (Writer writer = new FileWriter(folderPathOutput + boletimOcorrencia.getIdBO() + ".json")) {
-            Gson gson = new GsonBuilder().create();
-            gson.toJson(boletimOcorrencia, writer);
-        }
-    }
+		}
 
-    private List<ParteEnvolvida> parsePartesEnvolvidas(Document doc) {
-        List<ParteEnvolvida> partes = new ArrayList<>();
-        Elements elementVitimas = doc.getElementsMatchingOwnText("(Vítima)");
-        elementVitimas.remove(0);
-        Object[] vitimasRaw = elementVitimas.toArray();
-        for (Object vitimaRaw : vitimasRaw) {
-            String html = ((Element) vitimaRaw).html();
-            List<String> fragmentos = Arrays.asList(html.split(" - "));
+	}
 
-            ParteEnvolvida parteEnvolvida = new ParteEnvolvida();
+	private void gravarEmJson(String folderPathOutput, File file, BoletimOcorrencia boletimOcorrencia)
+			throws IOException {
+		try (Writer writer = new FileWriter(folderPathOutput + boletimOcorrencia.getIdBO() + ".json")) {
+			Gson gson = new GsonBuilder().create();
+			gson.toJson(boletimOcorrencia, writer);
+		}
+	}
 
-            String nomeAndTipoEnvolvimento = fragmentos.get(0);
+	private List<ParteEnvolvida> parsePartesEnvolvidas(Document doc) {
+		List<ParteEnvolvida> partes = new ArrayList<>();
+		Elements elementVitimas = doc.getElementsMatchingOwnText("(Vítima)");
+		elementVitimas.remove(0);
+		Object[] vitimasRaw = elementVitimas.toArray();
+		for (Object vitimaRaw : vitimasRaw) {
+			String html = ((Element) vitimaRaw).html();
+			List<String> fragmentos = Arrays.asList(html.split(" - "));
 
-            String nome = null;
+			ParteEnvolvida parteEnvolvida = new ParteEnvolvida();
 
-            Matcher macherTipoEnvolvimento = Pattern.compile("\\(([^)]+)\\)").matcher(nomeAndTipoEnvolvimento);
-            while (macherTipoEnvolvimento.find()) {
-                String tipoEnvolvimento = macherTipoEnvolvimento.group(1);
-                parteEnvolvida.setTipoEnvolvimento(tipoEnvolvimento);
-                nome = nomeAndTipoEnvolvimento.replace("(" + tipoEnvolvimento + ")", "").trim();
-                parteEnvolvida.setNome(nome);
-            }
+			String nomeAndTipoEnvolvimento = fragmentos.get(0);
 
-            for (String fragmento : fragmentos) {
-                if (fragmento.startsWith("RG:")) {
-                    parteEnvolvida.setRg(fragmento.replace("RG:", "").trim());
-                } else if (fragmento.startsWith("Natural de:")) {
-                    parteEnvolvida.setNaturalidade(fragmento.replace("Natural de:", "").trim());
-                } else if (fragmento.startsWith("Nacionalidade:")) {
-                    parteEnvolvida.setNacionalidade(fragmento.replace("Nacionalidade:", "").trim());
-                } else if (fragmento.startsWith("Sexo:")) {
+			String nome = null;
 
-                    String sexo = fragmento.replace("Sexo:", "").trim();
+			Matcher macherTipoEnvolvimento = Pattern.compile("\\(([^)]+)\\)").matcher(nomeAndTipoEnvolvimento);
+			while (macherTipoEnvolvimento.find()) {
+				String tipoEnvolvimento = macherTipoEnvolvimento.group(1);
+				parteEnvolvida.setTipoEnvolvimento(tipoEnvolvimento);
+				nome = nomeAndTipoEnvolvimento.replace("(" + tipoEnvolvimento + ")", "").trim();
+				parteEnvolvida.setNome(nome);
+			}
 
-                    if (sexo.replace("Masculino", "").trim().length() > 0 || sexo.replace("Feminino", "").trim().length() > 0) {
-                        String sexoEidade = sexo;
-                        String idade = null;
-                        if (sexoEidade.contains("Feminino")) {
-                            idade = sexoEidade.replace("Feminino", "").replace("anos", "").trim();
-                            parteEnvolvida.setSexo("Feminino");
-                        } else if (sexoEidade.contains("Masculino")) {
-                            idade = sexoEidade.replace("Masculino", "").replace("anos", "").trim();
-                            parteEnvolvida.setSexo("Masculino");
-                        }
-                        parteEnvolvida.setIdade(idade);
+			for (String fragmento : fragmentos) {
+				if (fragmento.startsWith("RG:")) {
+					parteEnvolvida.setRg(fragmento.replace("RG:", "").trim());
+				} else if (fragmento.startsWith("Natural de:")) {
+					parteEnvolvida.setNaturalidade(fragmento.replace("Natural de:", "").trim());
+				} else if (fragmento.startsWith("Nacionalidade:")) {
+					parteEnvolvida.setNacionalidade(fragmento.replace("Nacionalidade:", "").trim());
+				} else if (fragmento.startsWith("Sexo:")) {
 
-                    } else {
-                        parteEnvolvida.setSexo(sexo);
-                    }
+					String sexo = fragmento.replace("Sexo:", "").trim();
 
-                } else if (fragmento.startsWith("Nascimento:")) {
-                    String dataEidade = fragmento.replace("Nascimento:", "").trim();
-                    Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
-                    Matcher matcher = pattern.matcher(dataEidade);
-                    if (matcher.find()) {
-                        String data = matcher.group().trim();
-                        parteEnvolvida.setDataNascimento(data);
-                        String idade = dataEidade.replace(data, "").replace("anos", "").trim();
-                        parteEnvolvida.setIdade(idade);
-                    }
-                } else if (fragmento.startsWith("Estado Civil:")) {
-                    parteEnvolvida.setEstadoCivil(fragmento.replace("Estado Civil:", "").trim());
-                } else if (fragmento.startsWith("Profissão:")) {
-                    parteEnvolvida.setProfissao(fragmento.replace("Profissão:", "").trim());
-                } else if (fragmento.startsWith("Instrução:")) {
-                    parteEnvolvida.setInstrucao(fragmento.replace("Instrução:", "").trim());
-                } else if (fragmento.startsWith("Cutis:")) {
-                    parteEnvolvida.setCutis(fragmento.replace("Cutis:", "").trim());
-                } else if (fragmento.startsWith("Naturezas Envolvidas:")) {
-                    parteEnvolvida.setNaturezasEnvolvidas(fragmento.replace("Naturezas Envolvidas:", "").trim());
-                }
-            }
-            partes.add(parteEnvolvida);
-        }
+					if (sexo.replace("Masculino", "").trim().length() > 0
+							|| sexo.replace("Feminino", "").trim().length() > 0) {
+						String sexoEidade = sexo;
+						String idade = null;
+						if (sexoEidade.contains("Feminino")) {
+							idade = sexoEidade.replace("Feminino", "").replace("anos", "").trim();
+							parteEnvolvida.setSexo("Feminino");
+						} else if (sexoEidade.contains("Masculino")) {
+							idade = sexoEidade.replace("Masculino", "").replace("anos", "").trim();
+							parteEnvolvida.setSexo("Masculino");
+						}
+						parteEnvolvida.setIdade(idade);
 
-        return partes;
-    }
+					} else {
+						parteEnvolvida.setSexo(sexo);
+					}
+
+				} else if (fragmento.startsWith("Nascimento:")) {
+					String dataEidade = fragmento.replace("Nascimento:", "").trim();
+					Pattern pattern = Pattern.compile("([0-9]{2})/([0-9]{2})/([0-9]{4})");
+					Matcher matcher = pattern.matcher(dataEidade);
+					if (matcher.find()) {
+						String data = matcher.group().trim();
+						parteEnvolvida.setDataNascimento(data);
+						String idade = dataEidade.replace(data, "").replace("anos", "").trim();
+						parteEnvolvida.setIdade(idade);
+					}
+				} else if (fragmento.startsWith("Estado Civil:")) {
+					parteEnvolvida.setEstadoCivil(fragmento.replace("Estado Civil:", "").trim());
+				} else if (fragmento.startsWith("Profissão:")) {
+					parteEnvolvida.setProfissao(fragmento.replace("Profissão:", "").trim());
+				} else if (fragmento.startsWith("Instrução:")) {
+					parteEnvolvida.setInstrucao(fragmento.replace("Instrução:", "").trim());
+				} else if (fragmento.startsWith("Cutis:")) {
+					parteEnvolvida.setCutis(fragmento.replace("Cutis:", "").trim());
+				} else if (fragmento.startsWith("Naturezas Envolvidas:")) {
+					parteEnvolvida.setNaturezasEnvolvidas(fragmento.replace("Naturezas Envolvidas:", "").trim());
+				}
+			}
+			partes.add(parteEnvolvida);
+		}
+
+		return partes;
+	}
 
 }
