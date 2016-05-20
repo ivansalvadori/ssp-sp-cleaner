@@ -120,7 +120,7 @@ public class ParteEnvolvida {
     }
 
     public String printCSV() {
-        return  nome + "#" + tipoEnvolvimento + "#" + rg + "#" + naturalidade + "#" + nacionalidade + "#" + sexo + "#" + dataNascimento + "#" + idade + "#" + estadoCivil
+        return  nome + "#" + tipoEnvolvimento + "#" + tipoEnvolvimento + "#" + rg + "#" + naturalidade + "#" + nacionalidade + "#" + sexo + "#" + dataNascimento + "#" + idade + "#" + estadoCivil
                 + "#" + instrucao + "#" + profissao + "#" + cutis + "#" + naturezasEnvolvidas;
     }
     

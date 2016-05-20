@@ -39,8 +39,13 @@ public class BoletimOcorrenciasExtractor {
 
 				Document doc = Jsoup.parse(file, "UTF-8");
 
-				String dependencia = doc.select("span:matchesOwn(Dependência:)").first().siblingElements().first()
-						.html();
+				boletimOcorrencia.setTipoBoletim("Principal");
+				Elements divComplementar = doc.getElementsMatchingOwnText("(Complementar ao R.D.O. nº:)");
+				if (divComplementar.size() > 0) {
+					boletimOcorrencia.setTipoBoletim("Complementar");
+				}
+
+				String dependencia = doc.select("span:matchesOwn(Dependência:)").first().siblingElements().first().html();
 				boletimOcorrencia.setDependencia(dependencia);
 
 				String idDelegaciaENumeroBo = file.getName().replace(".html", "");
@@ -49,8 +54,7 @@ public class BoletimOcorrenciasExtractor {
 				boletimOcorrencia.setIdDelegacia(ideDelegacia);
 				boletimOcorrencia.setNumero(split[1].trim());
 
-				String numeroBoBarraAno = doc.select("span:matchesOwn(Boletim No.:)").first().siblingElements().first()
-						.html();
+				String numeroBoBarraAno = doc.select("span:matchesOwn(Boletim No.:)").first().siblingElements().first().html();
 				String numeroInformado = numeroBoBarraAno.split("/")[0];
 				String anoBo = numeroBoBarraAno.split("/")[1];
 				String formatoIdBo = "%s-%s-%s";
@@ -73,8 +77,7 @@ public class BoletimOcorrenciasExtractor {
 					Node nodoConsumado = nodoNatureza.nextSibling();
 					Node nodoDesdobramentos = nodoConsumado.nextSibling();
 					if (nodoDesdobramentos.childNode(0).childNode(0).childNodeSize() > 0) {
-						String desdobramentos = nodoDesdobramentos.childNode(1).childNode(0).childNode(0).toString()
-								.trim();
+						String desdobramentos = nodoDesdobramentos.childNode(1).childNode(0).childNode(0).toString().trim();
 						naturezaBoletim.setDesdobramentos(desdobramentos);
 					}
 					boletimOcorrencia.getNaturezas().add(naturezaBoletim);
@@ -92,8 +95,7 @@ public class BoletimOcorrenciasExtractor {
 					divInfoDetalhes = doc.select("div:matchesOwn(Circunscrição:)").get(0);
 				}
 
-				Iterator<Element> iteratorDetalhes = divInfoDetalhes.parent().parent().parent().getElementsByTag("div")
-						.iterator();
+				Iterator<Element> iteratorDetalhes = divInfoDetalhes.parent().parent().parent().getElementsByTag("div").iterator();
 				while (iteratorDetalhes.hasNext()) {
 					String textoDetalhe = iteratorDetalhes.next().html();
 					if (textoDetalhe.equalsIgnoreCase("Local:")) {
@@ -162,8 +164,7 @@ public class BoletimOcorrenciasExtractor {
 
 				Element elementExames = doc.getElementsContainingText("Exames requisitados:").last();
 				if (elementExames != null) {
-					boletimOcorrencia
-							.setExamesRequisitados(elementExames.html().replace("Exames requisitados:", "").trim());
+					boletimOcorrencia.setExamesRequisitados(elementExames.html().replace("Exames requisitados:", "").trim());
 				}
 
 				Element elementSolucao = doc.getElementsContainingText("Solução:").last();
@@ -183,8 +184,7 @@ public class BoletimOcorrenciasExtractor {
 
 	}
 
-	private void gravarEmJson(String folderPathOutput, File file, BoletimOcorrencia boletimOcorrencia)
-			throws IOException {
+	private void gravarEmJson(String folderPathOutput, File file, BoletimOcorrencia boletimOcorrencia) throws IOException {
 		try (Writer writer = new FileWriter(folderPathOutput + boletimOcorrencia.getIdBO() + ".json")) {
 			Gson gson = new GsonBuilder().create();
 			gson.toJson(boletimOcorrencia, writer);
@@ -225,8 +225,7 @@ public class BoletimOcorrenciasExtractor {
 
 					String sexo = fragmento.replace("Sexo:", "").trim();
 
-					if (sexo.replace("Masculino", "").trim().length() > 0
-							|| sexo.replace("Feminino", "").trim().length() > 0) {
+					if (sexo.replace("Masculino", "").trim().length() > 0 || sexo.replace("Feminino", "").trim().length() > 0) {
 						String sexoEidade = sexo;
 						String idade = null;
 						if (sexoEidade.contains("Feminino")) {

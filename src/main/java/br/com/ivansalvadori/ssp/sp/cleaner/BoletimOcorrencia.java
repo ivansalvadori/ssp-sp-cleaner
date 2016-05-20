@@ -7,6 +7,7 @@ public class BoletimOcorrencia {
     protected String idBO;
     protected String numero;
     protected String idDelegacia;
+    protected String tipoBoletim; 
     protected String dependencia;
     protected String local;
     protected String tipoLocal;
@@ -38,6 +39,14 @@ public class BoletimOcorrencia {
     public void setDependencia(String dependencia) {
         this.dependencia = dependencia;
     }
+    
+    public void setTipoBoletim(String tipoBoletim) {
+		this.tipoBoletim = tipoBoletim;
+	}
+    
+    public String getTipoBoletim() {
+		return tipoBoletim;
+	}
 
     public String getLocal() {
         return local;
@@ -168,7 +177,7 @@ public class BoletimOcorrencia {
     }
 
     public String printCSV() {
-        return idBO + "#" + numero + "#" + idDelegacia + "#" + dependencia + "#" + local + "#" + tipoLocal + "#" + circunscricao + "#" + dataOcorrencia + "#" + turnoOcorrencia + "#" + dataComunicacao + "#" + horaComunicacao + "#" + dataElaboracao + "#" + horaElaboracao + "#" + flagrante + "#"
+        return idBO + "#" + numero + "#" + idDelegacia + "#" + tipoBoletim + "#" + dependencia + "#" + local + "#" + tipoLocal + "#" + circunscricao + "#" + dataOcorrencia + "#" + turnoOcorrencia + "#" + dataComunicacao + "#" + horaComunicacao + "#" + dataElaboracao + "#" + horaElaboracao + "#" + flagrante + "#"
                 + examesRequisitados + "#" + solucao;
     }
 

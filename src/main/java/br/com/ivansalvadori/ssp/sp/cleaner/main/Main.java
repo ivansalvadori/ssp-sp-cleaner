@@ -30,7 +30,7 @@ public class Main {
     @PostConstruct
     public void iniciarDownload() throws IOException, InterruptedException {
     	if(opcao.equalsIgnoreCase("baixar")){
-    		listaOcorrenciasPoliciaisExtractor.parseListaEdownloadBOs(config.getPastaPaginasListagem(), config.getPastaLeituraBOs(), config.getSessionId());
+    	//	listaOcorrenciasPoliciaisExtractor.parseListaEdownloadBOs(config.getPastaPaginasListagem(), config.getPastaLeituraBOs(), config.getSessionId());
     	}
     	
     	else if(opcao.equalsIgnoreCase("processar")){
@@ -38,14 +38,15 @@ public class Main {
     	}
     	
     	else if(opcao.equalsIgnoreCase("baixar&processar")){
-    		listaOcorrenciasPoliciaisExtractor.parseListaEdownloadBOs(config.getPastaPaginasListagem(), config.getPastaLeituraBOs(), config.getSessionId());
-    		boletimOcorrenciasExtractor.parseDocument(config.getPastaLeituraBOs(), config.getPastaGravacaoBOsProcessados());
+    		//listaOcorrenciasPoliciaisExtractor.parseListaEdownloadBOs(config.getPastaPaginasListagem(), config.getPastaLeituraBOs(), config.getSessionId());
+    		//boletimOcorrenciasExtractor.parseDocument(config.getPastaLeituraBOs(), config.getPastaGravacaoBOsProcessados());
     	}
     	System.out.println("Fim...");
     }
 
     public static void main(String[] args) {
-    	opcao = args[0];
+    	//opcao = args[0];
+    	opcao = "processar";
         SpringApplication.run(Main.class, args);
     }
 
