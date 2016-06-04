@@ -1,9 +1,10 @@
 configuracoes:
    # configuração para download de BOs
-   pastaPaginasListagem: "/home/ivan/Documents/Working/DadosCriminaisSP/SSP-Datasets/HomicidioDoloso/2015/Nov/RawData/"
-   pastaGravacaoBOs: "/home/ivan/Documents/Working/DadosCriminaisSP/SSP-Datasets/HomicidioDoloso/2015/Nov/RawData/BOs/"
-   sessionId: "wvmuubkkllijo3s2lu4lsviw"
+   pastaPaginasListagem: "/home/ivan/Documents/Working/DadosCriminaisSP/SSP-Datasets/HomicidioDoloso/2014/RawData/ListasBOs/"
+   pastaGravacaoBOs: "/home/ivan/Documents/Working/DadosCriminaisSP/SSP-Datasets/HomicidioDoloso/2014/RawData/BOs/"
+   sessionId: "10cdcd3xc2tyyjduaalwcsj0"
 
    # configuração para processamento de BOs
-   pastaLeituraBOs: "/home/ivan/Downloads/RawData/TodosMeses/BOs/"
-   pastaGravacaoBOsProcessados: "//home/ivan/Downloads/RawData/TodosMeses/BOs/Processados/"
+   pastaLeituraBOs: "/home/ivan/Documents/Working/DadosCriminaisSP/SSP-Datasets/2014-Latrocinio-RawData/BOs"
+   pastaGravacaoBOsProcessados: "/home/ivan/Documents/Working/DadosCriminaisSP/SSP-Datasets/2014-Latrocinio-BOsProcessados/"
+

@@ -1,0 +1,29 @@
+Versão 1.2.0
+------------
+Corrigida a gravação do CSV das partes envolvidas.
+BOs complementares informam o ano, número e nome da delegacia do BO principal.
+
+
+Versão 1.1.1
+------------
+Corrigido o problema de inicialização da versão 1.1.0.
+
+
+Versão 1.1.0
+------------
+BOs agora informam se são Principal ou Complementar (Esta versão não pode ser usada).
+
+
+Versão 1.0.2
+------------
+Ajustado para continuar processando os bos após uma falha
+
+
+Versão 1.0.1
+------------
+Versão de correção do mescanismo de tentativas de downloads
+
+
+Versão 1.0.0
+------------
+Versão inicial

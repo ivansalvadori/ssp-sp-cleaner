@@ -43,6 +43,17 @@ public class BoletimOcorrenciasExtractor {
 				Elements divComplementar = doc.getElementsMatchingOwnText("(Complementar ao R.D.O. nº:)");
 				if (divComplementar.size() > 0) {
 					boletimOcorrencia.setTipoBoletim("Complementar");
+					
+					Element raizPropriedades = divComplementar.parents().get(0).parent().parent().parent().parent().nextElementSibling().nextElementSibling();
+					String textoBOprincipal = raizPropriedades.text();
+					String[] textoBOprincipalSplited = textoBOprincipal.split(" - ");
+					String numeroBoPrincipal = textoBOprincipalSplited[0].split("/")[0].trim();
+					String anoBoPrincipal = textoBOprincipalSplited[0].split("/")[1].trim();
+					String nomeDelegaciaBoPrincipal = textoBOprincipalSplited[1].trim();					
+					
+					boletimOcorrencia.setAnoBoPrincipal(anoBoPrincipal);
+					boletimOcorrencia.setNumeroBoPrincipal(numeroBoPrincipal);
+					boletimOcorrencia.setNomeDelegaciaBoPrincipal(nomeDelegaciaBoPrincipal);
 				}
 
 				String dependencia = doc.select("span:matchesOwn(Dependência:)").first().siblingElements().first().html();

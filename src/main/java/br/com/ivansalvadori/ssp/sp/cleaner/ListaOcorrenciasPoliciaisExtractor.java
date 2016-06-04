@@ -40,6 +40,15 @@ public class ListaOcorrenciasPoliciaisExtractor {
 				String ano = split[0].trim();
 				String numeroBo = split[1].trim();
 				String idDelegacia = split[2].trim();
+				
+				String boFilePath = pastaGravacaoBos + idDelegacia + "-" + numeroBo + ".html";
+				File boDownloaded  = new File(boFilePath);
+
+		        if(boDownloaded.exists()){
+		            System.out.println(boFilePath + " ja baixado");
+		            continue;
+		        }
+				
 				downloadBo(sessionId, ano, numeroBo, idDelegacia, pastaGravacaoBos);
 			}
 		}
