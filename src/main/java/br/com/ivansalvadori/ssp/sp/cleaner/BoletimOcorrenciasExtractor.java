@@ -113,7 +113,9 @@ public class BoletimOcorrenciasExtractor {
 						StringBuilder local = new StringBuilder(iteratorDetalhes.next().html());
 						local.append(" - ");
 						local.append(iteratorDetalhes.next().html());
-						boletimOcorrencia.setLocal(local.toString());
+						String localString = local.toString()
+								.replaceAll("\n", " - ").replaceAll("<br>", "");
+						boletimOcorrencia.setLocal(localString);
 					}
 					if (textoDetalhe.equalsIgnoreCase("Tipo de Local:")) {
 						StringBuilder tipoLocal = new StringBuilder(iteratorDetalhes.next().html());
