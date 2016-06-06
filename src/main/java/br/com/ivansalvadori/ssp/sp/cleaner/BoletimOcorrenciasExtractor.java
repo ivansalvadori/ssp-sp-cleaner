@@ -26,8 +26,8 @@ public class BoletimOcorrenciasExtractor {
 
 	private List<BoletimOcorrencia> boletinsProcessados = new ArrayList<>();
 
-	public void parseDocument(String folderPathInput, String folderPathOutput) throws IOException {
-		File[] files = new File(folderPathInput).listFiles();
+	public void parseDocument(File folderPathInput, File folderPathOutput) throws IOException {
+		File[] files = folderPathInput.listFiles();
 		for (File file : files) {
 			if (!file.isFile()) {
 				continue;
@@ -197,8 +197,8 @@ public class BoletimOcorrenciasExtractor {
 
 	}
 
-	private void gravarEmJson(String folderPathOutput, File file, BoletimOcorrencia boletimOcorrencia) throws IOException {
-		try (Writer writer = new FileWriter(folderPathOutput + boletimOcorrencia.getIdBO() + ".json")) {
+	private void gravarEmJson(File folderPathOutput, File file, BoletimOcorrencia boletimOcorrencia) throws IOException {
+		try (Writer writer = new FileWriter(new File(folderPathOutput, boletimOcorrencia.getIdBO() + ".json"))) {
 			Gson gson = new GsonBuilder().create();
 			gson.toJson(boletimOcorrencia, writer);
 		}

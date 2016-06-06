@@ -22,9 +22,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListaOcorrenciasPoliciaisExtractor {
 
-	public void parseListaEdownloadBOs(String pastaPaginasHomicidios, String pastaGravacaoBos, String sessionId)
+	public void parseListaEdownloadBOs(File pastaPaginasHomicidios, File pastaGravacaoBos, String sessionId)
 			throws IOException, InterruptedException {
-		File[] files = new File(pastaPaginasHomicidios).listFiles();
+		File[] files = pastaPaginasHomicidios.listFiles();
 		for (File file : files) {
 			if (!file.isFile()) {
 				continue;
@@ -41,11 +41,11 @@ public class ListaOcorrenciasPoliciaisExtractor {
 				String numeroBo = split[1].trim();
 				String idDelegacia = split[2].trim();
 				
-				String boFilePath = pastaGravacaoBos + idDelegacia + "-" + numeroBo + ".html";
-				File boDownloaded  = new File(boFilePath);
+				File boDownloaded  = new File(pastaGravacaoBos,
+						idDelegacia + "-" + numeroBo + ".html");
 
 		        if(boDownloaded.exists()){
-		            System.out.println(boFilePath + " ja baixado");
+		            System.out.println(boDownloaded.getPath() + " ja baixado");
 		            continue;
 		        }
 				
@@ -54,10 +54,10 @@ public class ListaOcorrenciasPoliciaisExtractor {
 		}
 	}
 
-	public void downloadBo(String sessionId, String ano, String numeroBo, String idDelegacia, String pastaGravacaoBos)
+	public void downloadBo(String sessionId, String ano, String numeroBo, String idDelegacia, File pastaGravacaoBos)
 			throws IOException, InterruptedException {
 
-		String boFilePath = pastaGravacaoBos + idDelegacia + "-" + numeroBo + ".html";
+		File boFile = new File(pastaGravacaoBos, idDelegacia + "-" + numeroBo + ".html");
 
 		System.out.println("baixando BO: " + idDelegacia + "-" + numeroBo);
 
@@ -78,9 +78,9 @@ public class ListaOcorrenciasPoliciaisExtractor {
 			InputStream boHtml = bOresponse.getEntity().getContent();
 
 			try {
-				Files.copy(boHtml, Paths.get(boFilePath));
+				Files.copy(boHtml, boFile.toPath());
 			} catch (FileAlreadyExistsException e) {
-				System.out.println(boFilePath + " já existe");
+				System.out.println(boFile + " já existe");
 			}
 
 		} catch (HttpHostConnectException e) {

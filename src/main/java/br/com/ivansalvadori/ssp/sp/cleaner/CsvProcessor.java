@@ -1,5 +1,6 @@
 package br.com.ivansalvadori.ssp.sp.cleaner;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -8,7 +9,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 public class CsvProcessor {
 
-	public void gravarCSV(List<BoletimOcorrencia> boletinsProcessados, String folderPathOutput) throws IOException {
+	public void gravarCSV(List<BoletimOcorrencia> boletinsProcessados, File folderPathOutput) throws IOException {
 
 		gravarBoletim(boletinsProcessados, folderPathOutput);
 		gravarPartes(boletinsProcessados, folderPathOutput);
@@ -16,8 +17,8 @@ public class CsvProcessor {
 
 	}
 
-	private void gravarBoletim(List<BoletimOcorrencia> boletinsProcessados, String folderPathOutput) throws IOException {
-		try (CSVWriter writer = new CSVWriter(new FileWriter(folderPathOutput + "boletins.csv"), '\t')) {
+	private void gravarBoletim(List<BoletimOcorrencia> boletinsProcessados, File folderPathOutput) throws IOException {
+		try (CSVWriter writer = new CSVWriter(new FileWriter(new File(folderPathOutput, "boletins.csv")), '\t')) {
 			String[] titulos = "idBO,numeroBO,idDelegacia,tipoBO,dependencia,local,tipoLocal,circunscricao,dataOcorrencia,turnoOcorrencia,dataComunicacao,horaComunicacao,dataElaboracao,horaElaboracao,flagrante,examesRequisitados,solucao,numeroBoPrincipal,anoBoPrincipal,nomeDelegaciaBoPrincipal".split(",");
 			writer.writeNext(titulos);
 
@@ -28,9 +29,9 @@ public class CsvProcessor {
 		}
 	}
 
-	private void gravarPartes(List<BoletimOcorrencia> boletinsProcessados, String folderPathOutput) throws IOException {
+	private void gravarPartes(List<BoletimOcorrencia> boletinsProcessados, File folderPathOutput) throws IOException {
 
-		try (CSVWriter writer = new CSVWriter(new FileWriter(folderPathOutput + "partesEnvolvidas.csv"), '\t')) {
+		try (CSVWriter writer = new CSVWriter(new FileWriter(new File(folderPathOutput, "partesEnvolvidas.csv")), '\t')) {
 			String[] titulos = "IdBO,tipoBO,nome,tipoEnvolvimento,rg,naturalidade,nacionalidade,sexo,dataNascimento,idade,estadoCivil,instrucao,profissao,cutis,naturezasEnvolvidas".split(",");
 			writer.writeNext(titulos);
 
@@ -47,9 +48,9 @@ public class CsvProcessor {
 		}
 	}
 
-	private void gravarNaturezas(List<BoletimOcorrencia> boletinsProcessados, String folderPathOutput) throws IOException {
+	private void gravarNaturezas(List<BoletimOcorrencia> boletinsProcessados, File folderPathOutput) throws IOException {
 
-		try (CSVWriter writer = new CSVWriter(new FileWriter(folderPathOutput + "naturezas.csv"), '\t')) {
+		try (CSVWriter writer = new CSVWriter(new FileWriter(new File(folderPathOutput, "naturezas.csv")), '\t')) {
 			String[] titulos = "IdBO,tipoBO,especie,descricao,desdobramentos".split(",");
 			writer.writeNext(titulos);
 
