@@ -1,0 +1,8 @@
+{
+  "specs" : [
+    {
+      "nacionalidade" : "BRASILEIRA",
+      "regexps" : [ "^BR(?:A.*|\\.?)$" ]
+    }
+  ]
+}
