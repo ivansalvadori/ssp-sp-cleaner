@@ -23,7 +23,7 @@ import com.google.gson.GsonBuilder;
 
 @Component
 public class BoletimOcorrenciasExtractor {
-
+	private NacionalidadeSanitizer nacionalidadeSanitizer = new NacionalidadeSanitizer();
 	private List<BoletimOcorrencia> boletinsProcessados = new ArrayList<>();
 
 	public void parseDocument(File folderPathInput, File folderPathOutput) throws IOException {
@@ -233,7 +233,9 @@ public class BoletimOcorrenciasExtractor {
 				} else if (fragmento.startsWith("Natural de:")) {
 					parteEnvolvida.setNaturalidade(fragmento.replace("Natural de:", "").trim());
 				} else if (fragmento.startsWith("Nacionalidade:")) {
-					parteEnvolvida.setNacionalidade(fragmento.replace("Nacionalidade:", "").trim());
+					String nacionalidade = fragmento.replace("Nacionalidade:", "").trim();
+					nacionalidade = nacionalidadeSanitizer.sanitize(nacionalidade);
+					parteEnvolvida.setNacionalidade(nacionalidade);
 				} else if (fragmento.startsWith("Sexo:")) {
 
 					String sexo = fragmento.replace("Sexo:", "").trim();
