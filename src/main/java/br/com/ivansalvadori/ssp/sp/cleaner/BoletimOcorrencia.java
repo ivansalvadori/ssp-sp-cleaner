@@ -26,6 +26,7 @@ public class BoletimOcorrencia {
 	protected String numeroBoPrincipal;
 	protected String anoBoPrincipal;
 	protected String nomeDelegaciaBoPrincipal;
+	protected String categoria;
 
 	public String getNumero() {
 		return numero;
@@ -203,8 +204,16 @@ public class BoletimOcorrencia {
 		this.nomeDelegaciaBoPrincipal = nomeDelegaciaBoPrincipal;
 	}
 
+	public String getCategoria() {
+		return categoria;
+	}
+
+	public void setCategoria(String categoria) {
+		this.categoria = categoria;
+	}
+
 	public String printCSV() {
-		return idBO + "#" + numero + "#" + idDelegacia + "#" + tipoBoletim + "#" + dependencia + "#" + local + "#" + tipoLocal + "#" + circunscricao + "#" + dataOcorrencia + "#" + turnoOcorrencia + "#" + dataComunicacao + "#" + horaComunicacao + "#" + dataElaboracao + "#" + horaElaboracao + "#" + flagrante + "#" + examesRequisitados + "#" + solucao + "#" + numeroBoPrincipal + "#" + anoBoPrincipal + "#" + nomeDelegaciaBoPrincipal;
+		return idBO + "#" + numero + "#" + idDelegacia + "#" + tipoBoletim + "#" + dependencia + "#" + local + "#" + tipoLocal + "#" + circunscricao + "#" + dataOcorrencia + "#" + turnoOcorrencia + "#" + dataComunicacao + "#" + horaComunicacao + "#" + dataElaboracao + "#" + horaElaboracao + "#" + flagrante + "#" + examesRequisitados + "#" + solucao + "#" + numeroBoPrincipal + "#" + anoBoPrincipal + "#" + nomeDelegaciaBoPrincipal + "#" + categoria;
 	}
 
 }
