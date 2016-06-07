@@ -26,7 +26,7 @@ public class BoletimOcorrenciasExtractor {
 	private NacionalidadeSanitizer nacionalidadeSanitizer = new NacionalidadeSanitizer();
 	private List<BoletimOcorrencia> boletinsProcessados = new ArrayList<>();
 
-	public void parseDocument(File folderPathInput, File folderPathOutput) throws IOException {
+	public void parseDocument(File folderPathInput, File folderPathOutput, String categoria) throws IOException {
 		File[] files = folderPathInput.listFiles();
 		for (File file : files) {
 			if (!file.isFile()) {
@@ -184,6 +184,7 @@ public class BoletimOcorrenciasExtractor {
 				if (elementSolucao != null) {
 					boletimOcorrencia.setSolucao(elementSolucao.html().replace("Solução:", "").trim());
 				}
+				boletimOcorrencia.setCategoria(categoria);
 
 				boletinsProcessados.add(boletimOcorrencia);
 				new CsvProcessor().gravarCSV(boletinsProcessados, folderPathOutput);

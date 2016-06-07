@@ -19,7 +19,7 @@ public class CsvProcessor {
 
 	private void gravarBoletim(List<BoletimOcorrencia> boletinsProcessados, File folderPathOutput) throws IOException {
 		try (CSVWriter writer = new CSVWriter(new FileWriter(new File(folderPathOutput, "boletins.csv")), '\t')) {
-			String[] titulos = "idBO,numeroBO,idDelegacia,tipoBO,dependencia,local,tipoLocal,circunscricao,dataOcorrencia,turnoOcorrencia,dataComunicacao,horaComunicacao,dataElaboracao,horaElaboracao,flagrante,examesRequisitados,solucao,numeroBoPrincipal,anoBoPrincipal,nomeDelegaciaBoPrincipal".split(",");
+			String[] titulos = "idBO,numeroBO,idDelegacia,tipoBO,dependencia,local,tipoLocal,circunscricao,dataOcorrencia,turnoOcorrencia,dataComunicacao,horaComunicacao,dataElaboracao,horaElaboracao,flagrante,examesRequisitados,solucao,numeroBoPrincipal,anoBoPrincipal,nomeDelegaciaBoPrincipal,categoria".split(",");
 			writer.writeNext(titulos);
 
 			for (BoletimOcorrencia boletimOcorrencia : boletinsProcessados) {

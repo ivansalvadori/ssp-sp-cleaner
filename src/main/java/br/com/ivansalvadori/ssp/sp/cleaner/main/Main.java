@@ -18,10 +18,13 @@ import br.com.ivansalvadori.ssp.sp.cleaner.ListaOcorrenciasPoliciaisExtractor;
 @ComponentScan("br.com.ivansalvadori.ssp")
 @SpringBootApplication
 public class Main implements CommandLineRunner {
+	@Option(name = "--categoria")
+	private String categoria = null;
+
 	@Option(name = "--baixar", aliases = {"-b"})
 	private boolean baixar = false;
 
-	@Option(name = "--processar", aliases = {"-p"})
+	@Option(name = "--processar", aliases = {"-p"}, depends = {"--categoria"})
 	private boolean processar = false;
 
 	@Option(name = "--processados")
@@ -81,7 +84,7 @@ public class Main implements CommandLineRunner {
 		}
 		if (processar) {
 			createDir(processados);
-			boletimOcorrenciasExtractor.parseDocument(baixados, processados);
+			boletimOcorrenciasExtractor.parseDocument(baixados, processados, categoria);
 		}
 
 		System.out.println("Fim...");
